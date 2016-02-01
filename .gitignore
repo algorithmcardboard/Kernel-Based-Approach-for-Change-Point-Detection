@@ -60,3 +60,4 @@ target/
 
 data
 .venv
+.ipynb_checkpoints
