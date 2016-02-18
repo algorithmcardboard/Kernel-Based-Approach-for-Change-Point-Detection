@@ -62,3 +62,8 @@ data
 .venv
 .ipynb_checkpoints
 nohup.out
+
+*.swp
+*.dvi
+*.ps
+*.aux
