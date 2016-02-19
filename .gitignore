@@ -67,3 +67,7 @@ nohup.out
 *.dvi
 *.ps
 *.aux
+
+*.bbl
+*.blg
+*.out
