@@ -80,7 +80,7 @@ Where k represents the position of the single change point. (Refer 3.1 of~\cite{
 
 This can be solved by following the steps described in section 3.1.1 of~\cite{birkhauser_pscpa}.  As in the case of univariate model, finding the likelihood directly is computationally intractable as $2\pi$ and $e$ has negative powers that can go pretty large and hence the likelihood will always become 1.
 
-\subsection{Experiments}
+\subsubsection{Experiments}
 We did Several experiments by varying the number of dimension and also the total number of samples.  So far, in all variations, we are able to identify the change point pretty accurately using the offline detection method described above.  The plots below are for dimension = 6 and number of samples = 600 with change point at 300.
 
 \begin{figure}[ht!]
@@ -114,8 +114,62 @@ We did Several experiments by varying the number of dimension and also the total
 \end{enumerate}
 
 \section{Online Detection}
+\subsection{Univariate detection}
+Online detection of change point is slightly difficult than offline detection. We have a series of observation defined by $x_{1}, x_{2}, \ldots, x_{n} $.  Each observation denoted by $x_{i}$ is assumed to be made of N samples.
+
+We start by defining a sufficient stastic as:
+\begin{align}
+  s_{i} = \ln{\frac{p\theta_{1}(y_{i})}{p\theta_{0}(y_{i})}}
+\end{align}
+
+We also define a decision rule d given by
+\begin{align}
+  d = \begin{cases}
+    0 & if S_{1}^{N} < h; H_{0} \text{~is chosen}\\
+    1 & if S_{1}^{N} \ge h; H_{1} \text{~is chosen}\\
+      \end{cases}
+\end{align}
+
+Where h is a threshold chosen by the user.  $S_{1}^{N}$ is called as the decision function.
+
+We also have a stopping rule which is defined by 
+\begin{align}
+  t_{a} = N.\min{K : d_{K} = 1}
+\end{align}
+Where d is the decision taken with the aid of the decision function defined above.  This method of finding the stopping rule and alarm time is as given in\cite{basseville_nikiforov}
+
+\subsubsection{Experiments}
+
+We run experiments using grid search with various values of h and kappa.  In this particular experiment, we used values ranging from 1.5 to 5.5 with step size 0.25 for h and 0.5 to 4 with step size of 0.25 for kappa.  We then proceed to find all the values of the stopping rule and also the alarm time for h and kappa combination.  The time series, the plots for alarm time and stopping rule are plotted below.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/1d_online/ts}
+  \caption{One dimensional time series for online detection.\label{fig:1d_o_ts}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/1d_online/time}
+  \caption{Stopping rule for various values of h and kappa.\label{fig:1d_o_time}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/1d_online/alarm}
+  \caption{Alarm time for values of h and kappa.\label{fig:1d_o_alarm}}
+\end{figure}
+
+\subsubsection{Observations}
+On retrospect, it doesn't make sense to do a grid search over h and kappa values as they dont impact alarm time or the stopping rule jointly.  The graphs obtained by plotting h values, kappa values and alarm time/stopping rule reflects this.
+
+\subsubsection{Questions \& Challenges}
+\begin{enumerate}
+  \item How to find the correct value for h and kappa given a distribution.
+\end{enumerate}
+
+\newpage
 
 \bibliographystyle{plain}
 \bibliography{references}
-
 \end{document}
