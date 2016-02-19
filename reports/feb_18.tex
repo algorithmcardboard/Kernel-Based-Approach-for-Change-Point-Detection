@@ -56,7 +56,57 @@ The offline changepoint detection problem, gives a pretty accurate value for cha
   \caption{VK values for one dimensional offline detection problem.\label{fig:1d_vk}}
 \end{figure}
 
+\subsubsection{Questions \& Challenges}
+\begin{enumerate}
+  \item Finding how to derive sk, vk and $T^{2}$ test stastic for our own dataset when mean, and standard deviations are not known.
+  \item Understanding what sk and vk represent.
+\end{enumerate}
+
 \subsection{Multi-variate Detection}
+Multivariate model is similar to the above Univariate model except that each and every observation is m-dimensional.
+Let $x_{1}, x_{2}, \ldots , x_{n}$ be a sequence of independent $m$-dimensional normal random vectors with parameters $(\mu_{1}, \Sigma_{1}), (\mu_{2}, \Sigma_{2}), \ldots, (\mu_{n}, \Sigma_{n})$, respectively.
+Assume $\Sigma_{1} = \Sigma_{2} = \cdots = \Sigma_{n} = \Sigma $.
+The null hypothesis is given by 
+\begin{align}
+H_{0} : \mu_{1} = \mu_{2} = \cdots = \mu_{n} = \mu (\mathrm{unknown})
+\end{align}
+
+If we assume that there is a change at point $k$ in the paramters governing the observation, then the hypothesis (alternate hypothesis) is given by
+
+\begin{align}
+H_{1} : \mu_{1} = \cdots = \mu_{k} \ne \mu_{k+1} = \mu_{n}
+\end{align}
+Where k represents the position of the single change point. (Refer 3.1 of~\cite{birkhauser_pscpa}).
+
+This can be solved by following the steps described in section 3.1.1 of~\cite{birkhauser_pscpa}.  As in the case of univariate model, finding the likelihood directly is computationally intractable as $2\pi$ and $e$ has negative powers that can go pretty large and hence the likelihood will always become 1.
+
+\subsection{Experiments}
+We did Several experiments by varying the number of dimension and also the total number of samples.  So far, in all variations, we are able to identify the change point pretty accurately using the offline detection method described above.  The plots below are for dimension = 6 and number of samples = 600 with change point at 300.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/rd_offline/ts}
+  \caption{Multi dimensional time series.\label{fig:rd_ts}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/rd_offline/y_k}
+  \caption{Value of y\_k with respect to various k.\label{fig:rd_y_k}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/rd_offline/w_k}
+  \caption{Value of w\_k with respect to various k.\label{fig:rd_w_k}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/rd_offline/tk_sq}
+  \caption{Value of the test stastic $ T_{k}^{2} $ with respect to various k.\label{fig:rd_tk_sq}}
+\end{figure}
+
 \section{Online Detection}
 
 \bibliographystyle{plain}
