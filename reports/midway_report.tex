@@ -334,6 +334,27 @@ The change points can be identified by using the contrast function
   J_{n}(\tau, y) = -\frac{1}{n} \sum_{k=1}^{k*} (n_{k} \sum_{j=1}^{J} F^{2}_{kj})
 \end{align}
 
+\subsection{Experiments --- Multivariate signal}
+A time series defined by frequency components present in brain wave signals is present below.  The formula for peridogram defined in the earlier section is found to be more roboust than the formula defined above.  The peridogram of the signals are displayed below.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/changepoint_sd/ts}
+  \caption{Time series formed by linear combination of sinusoidals with same frequency as that of brain signals.\label{fig:cp_sd_ts}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/changepoint_sd/peri1}
+  \caption{Peridogram defined by the formula given in earlier section.\label{fig:cp_sd_ts}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/changepoint_sd/peri1}
+  \caption{Peridogram defined by the formula given in the current section.\label{fig:cp_sd_ts}}
+\end{figure}
+
 \bibliographystyle{plain}
 \bibliography{references}
 \end{document}
