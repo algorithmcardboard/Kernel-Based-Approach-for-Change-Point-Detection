@@ -1,6 +1,6 @@
 import generate_ts as ts
 import numpy as np
-
+from scipy.ndimage.interpolation import shift
 
 """
     Constants
@@ -30,17 +30,26 @@ def contfunc(y, segment_length, ld):
 
     frech = 1;
     nc=5
-    f= np.absolute(np.fft.fft(x))
-    f=f[0:(n/2)]; nf=f.shape[0];
+    f= np.absolute(np.fft.fft(x));
+    f=f[0:(n/2)]; 
+    nf=f.shape[0];
     print('n is ', n, ' f shape is ', f.shape)
 
     f2=np.cumsum(f)/np.sum(f)
     print('f2 is ', np.sum(f2))
+    f1 = shift(f2, 1, cval=0)
+    c = np.zeros(nc+1)
+    c[nc] = nf;
+    for i in range(1, nc-1):
+        #c(i)=find( (f1<=(i-1)/nc) & (f2>(i-1)/nc) );
+        print(i)
+
+    print(c)
 
     return matD
 
 
-y = ts.get_random_ts()
+y = ts.get_random_ts('ts.csv')
 n = y.shape[0]
 nmax = 1000
 ld = np.maximum(1,np.round(n/nmax))

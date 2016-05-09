@@ -1,7 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def get_random_ts():
+def get_random_ts(filename = None):
+
+    if filename is not None:
+        TS = np.loadtxt(filename)
+        return TS
     """
     " All constants declaration
     """
