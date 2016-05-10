@@ -40,11 +40,33 @@ def contfunc(y, segment_length, ld):
     f1 = shift(f2, 1, cval=0)
     c = np.zeros(nc+1)
     c[nc] = nf;
-    for i in range(1, nc-1):
-        #c(i)=find( (f1<=(i-1)/nc) & (f2>(i-1)/nc) );
-        print(i)
+    for i in range(1, nc):
+        c[i]=np.where((f1<=(i)/nc) & (f2>(i)/nc))[0][0]+1;
 
-    print(c)
+    lam = c/(2*c[nc])
+    c = c - 1;
+
+    cons=2*np.pi/frech;
+    a=np.zeros((nc+1,n));
+
+#ina=np.arange(0, int(n - 1))
+    ina=np.arange(1, int(n))
+    a[:,0]=lam*cons;
+    a[:,1:n] = np.sin(np.matrix(lam).T * np.matrix(ina) *  cons)/(np.ones((nc+1, 1))*ina)
+    da = np.diff(a, axis=0)
+    A=np.zeros((n,n));
+    for k in np.arange(nc):
+        b=da[k,:]
+        MU=np.zeros((n,n));
+        for s in np.arange(n):
+            xs=x[s];
+            xjs=xs*xs*b[0];
+            MU[s,s]=xjs;
+            for j in np.arange(0,s-1):
+                xjs=xjs+2*xs*x(s-j)*b(j+1);
+                MU[s-j,s]=xjs;
+        A=cumsum(MU,2);
+        matD=matD - np.multiply(A,A);
 
     return matD
 
