@@ -6,6 +6,7 @@ from scipy.ndimage.interpolation import shift
     Constants
 """
 SEGMENT_LENGTH = 15
+segment_length = SEGMENT_LENGTH
 MaX_SEGMENTS = 20
 NMAX = 1000
 
@@ -20,9 +21,7 @@ def contfunc(y, segment_length, ld):
     print("n is ", n, " ld is ", ld)
     lmind=np.ceil(segment_length/ld)
     matD = np.empty((n, n))
-    print('matD shape is ', matD.shape)
     matD.fill(np.inf)
-    print('matD shape is ', matD.shape)
     matD=np.tril(matD,lmind-2)
 
     x = y - np.mean(y)
@@ -44,7 +43,6 @@ def contfunc(y, segment_length, ld):
         c[i]=np.where((f1<=(i)/nc) & (f2>(i)/nc))[0][0]+1;
 
     lam = c/(2*c[nc])
-    c = c - 1;
 
     cons=2*np.pi/frech;
     a=np.zeros((nc+1,n));
@@ -55,18 +53,18 @@ def contfunc(y, segment_length, ld):
     a[:,1:n] = np.sin(np.matrix(lam).T * np.matrix(ina) *  cons)/(np.ones((nc+1, 1))*ina)
     da = np.diff(a, axis=0)
     A=np.zeros((n,n));
-    for k in np.arange(nc):
+    for k in np.arange(int(nc)):
         b=da[k,:]
         MU=np.zeros((n,n));
-        for s in np.arange(n):
+        for s in np.arange(int(n)):
             xs=x[s];
             xjs=xs*xs*b[0];
             MU[s,s]=xjs;
-            for j in np.arange(0,s-1):
-                xjs=xjs+2*xs*x(s-j)*b(j+1);
-                MU[s-j,s]=xjs;
-        A=cumsum(MU,2);
-        matD=matD - np.multiply(A,A);
+            for j in np.arange(0,s):
+                xjs=xjs+(2*xs*x[s-j-1]*b[j+1]);
+                MU[s-j-1,s]=xjs;
+        A=np.cumsum(MU,axis=1);
+        matD= matD - np.multiply(A,A);
 
     return matD
 
