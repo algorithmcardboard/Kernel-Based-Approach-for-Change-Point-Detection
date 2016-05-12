@@ -1,6 +1,7 @@
 import generate_ts as ts
 import numpy as np
 from scipy.ndimage.interpolation import shift
+from scipy.linalg import toeplitz
 
 """
     Constants
@@ -47,7 +48,6 @@ def contfunc(y, segment_length, ld):
     cons=2*np.pi/frech;
     a=np.zeros((nc+1,n));
 
-#ina=np.arange(0, int(n - 1))
     ina=np.arange(1, int(n))
     a[:,0]=lam*cons;
     a[:,1:n] = np.sin(np.matrix(lam).T * np.matrix(ina) *  cons)/(np.ones((nc+1, 1))*ina)
@@ -66,6 +66,7 @@ def contfunc(y, segment_length, ld):
         A=np.cumsum(MU,axis=1);
         matD= matD - np.multiply(A,A);
 
+    matD = np.divide(matD, toeplitz(np.arange(1,n+1), np.arange(1,n+1)))
     return matD
 
 
@@ -80,5 +81,17 @@ xm=y[0:m]
 
 matD = contfunc(xm, SEGMENT_LENGTH, ld)
 
-#print(y.shape)
-#print(xm.shape)
+if matD[0,n-1] < 0:
+    matD=matD -2*matD[0,n-1] * (toeplitz(np.arange(1,n+1), np.arange(1,n+1))/n);
+
+
+I = matD.argmin(axis=0)
+Mmin = matD.min(axis=0)
+
+j = Mmin.argmin()
+MMin = Mmin.min()
+i=I[j];
+
+matD=matD - (MMin/(j-i+1))*toeplitz(np.arange(1,n+1), np.arange(1,n+1))
+
+
