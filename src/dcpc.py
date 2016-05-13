@@ -78,6 +78,7 @@ print('ld after maximum is ', ld)
 m= ld * np.fix(n/ld)
 print("m is ",m)
 xm=y[0:m]
+Kmax = 20;
 
 matD = contfunc(xm, SEGMENT_LENGTH, ld)
 
@@ -94,4 +95,30 @@ i=I[j];
 
 matD=matD - (MMin/(j-i+1))*toeplitz(np.arange(1,n+1), np.arange(1,n+1))
 
+N,N = matD.shape
+I = np.empty((Kmax, N))
+I.fill(np.inf)
 
+t   = np.zeros((Kmax-1,N));
+I[0]=matD[0]
+for k in np.arange(1,Kmax-1):
+    for L in np.arange(k, N):
+        arr = I[k-1, np.arange(0,L)]+matD[np.arange(1,(L+1)),L]
+        index = np.argmin(arr)
+        val = arr[index]
+        I[k, L] = val
+        t[k-1, L] = index
+
+arr = I[Kmax-2, np.arange(0,N-1)] + matD[np.arange(1,N),N-1]
+index = np.argmin(arr)
+val = arr[index]
+
+I[Kmax-1,N-1] = val
+t[Kmax-2,N-1] = index
+J=I[:,N-1];
+
+t_est = np.diag(np.full(Kmax, N-1))
+
+for K in np.arange(1,Kmax):
+    for k in np.arange(0, K)[K::-1]:
+        t_est[K,k] = t[k,t_est[K,k+1]];
