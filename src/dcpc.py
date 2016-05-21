@@ -1,9 +1,6 @@
 import generate_ts as ts
 import numpy as np
-from scipy.ndimage.interpolation import shift
-from scipy.linalg import toeplitz
-from scipy.stats import t
-from dcpc_functions import contfunc, dynaprog, pvalreg
+from dcpc_functions import contfunc, dynaprog, pvalreg, moselci
 
 """
     Constants
@@ -39,55 +36,6 @@ J, T = dynaprog(matD, Kmax)
 T=T*ld;
 T=T-np.diag(np.diag(T))+np.diag(n*np.ones(Kmax));
 
-Kmax = J.shape[0];
-pen= np.arange(1,Kmax+1)
+Ke,M,PVAL,A = moselci(J,alpha,n)
 
-PVAL = np.zeros(Kmax);
-PVAL[0]=alpha;
-A=np.zeros((Kmax-2,3));
-
-for k in np.arange(1,Kmax-2):
-    print(k);
-    vx = np.arange(k, Kmax+1)
-    V = np.hstack((np.ones((vx.shape[0], 1)), np.matrix(vx).reshape(vx.shape[0],1)))
-    V = np.hstack( (V, (vx * np.log(n/vx)).reshape(vx.shape[0],1) ))
-    pval,a,f = pvalreg(V,J[vx-1])
-    PVAL[k]=pval
-    A[k,:]=a
-
-kv=[];
-dv=[];
-pv=[np.Inf];
-dmax=1;
-pmax=np.Inf;
-k=0
-
-while k<Kmax:
-    pk=(J[k+1:Kmax]-J[k])/(pen[k]-pen[k+1:Kmax]);
-    if(pk.shape[0] < 1):
-        break;
-    dm = pk.argmax();
-    pm=pk.max()
-    kv.append(k);
-    dv.append(dm);
-    pv.append(pm);
-    if (dm>dmax and k>1):  
-        dmax=dm; 
-        pmax=pm
-    print(k, dm, pm, dmax, pmax);
-    k=k+dm+1;
-
-
-lon = -1*np.diff(pv);
-
-kv = np.array(kv)
-pv = np.array(pv)
-
-M = np.vstack((kv+1, pv[1:], pv[:-1], lon*-1)).T
-Ko = kv.shape[0]
-
-il= []
-for i in np.arange(0,Ko-1):
-    if lon[i]>np.max(lon[i+1:Ko]):
-        il.append(i);
-
+print('changepoints are given by ', T[4, 0:3])

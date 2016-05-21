@@ -126,3 +126,83 @@ def pvalreg(M,Y):
     pval = 1-1*t.cdf(delta*np.sqrt(df)/normr/e, df)
     f = np.vstack((vk, V))* np.matrix(a).T
     return pval,a,f
+
+def moselci(J, alpha, n):
+    Kmax = J.shape[0];
+    pen= np.arange(1,Kmax+1)
+
+    PVAL = np.zeros(Kmax);
+    PVAL[0]=alpha;
+    A=np.zeros((Kmax-2,3));
+
+    for k in np.arange(1,Kmax-2):
+        print(k);
+        vx = np.arange(k, Kmax+1)
+        V = np.hstack((np.ones((vx.shape[0], 1)), np.matrix(vx).reshape(vx.shape[0],1)))
+        V = np.hstack( (V, (vx * np.log(n/vx)).reshape(vx.shape[0],1) ))
+        pval,a,f = pvalreg(V,J[vx-1])
+        PVAL[k]=pval
+        A[k,:]=a
+
+    kv=[];
+    dv=[];
+    pv=[np.Inf];
+    dmax=1;
+    pmax=np.Inf;
+    k=0
+
+    while k<Kmax:
+        pk=(J[k+1:Kmax]-J[k])/(pen[k]-pen[k+1:Kmax]);
+        if(pk.shape[0] < 1):
+            break;
+        dm = pk.argmax();
+        pm=pk.max()
+        kv.append(k);
+        dv.append(dm);
+        pv.append(pm);
+        if (dm>dmax and k>1):  
+            dmax=dm; 
+            pmax=pm
+        print(k, dm, pm, dmax, pmax);
+        k=k+dm+1;
+
+
+    kv = np.array(kv)
+    pv = np.array(pv)
+
+    lon = -1*np.diff(pv);
+
+    M = np.vstack((kv+1, pv[1:], pv[:-1], lon)).T
+    Ko = kv.shape[0]
+
+    il= []
+    for i in np.arange(0,Ko-1):
+        if lon[i]>np.max(lon[i+1:Ko]):
+            il.append(i);
+
+    M = M[il]
+    Kc=kv[il]
+
+    M = np.array(np.hstack((M, np.matrix(PVAL[Kc]).T)))
+
+    j = (M[:,-1] < alpha).nonzero()[0]
+
+    if j.shape[0] <= 0:
+        Ke1=1;
+    else:
+        Ke1 = M[j[-1], 0]
+
+    K = np.argmin(J)
+    minJ = J[K]
+    J1 = J[np.arange(0,K+1)]
+    K0 = 0
+    S = 0.7
+    V=(J1[K]-J1[K0:K+1])/(J1[K]-J[K0])*(K-K0)+1;
+    ddV = np.hstack((1, np.diff(np.diff(V))))
+    ddV = np.hstack((ddV, np.zeros(Kmax - ddV.shape[0])))
+    Ke2 = np.where(ddV > S)[0].max()
+    M = np.hstack((M,np.matrix(ddV[Kc]).T))
+    Ke = np.array([Ke1, Ke2+1])
+    Ke = Ke1
+
+    return Ke, M, PVAL, A
