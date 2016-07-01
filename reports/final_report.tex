@@ -1,0 +1,372 @@
+\documentclass{article}
+
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage[T1]{fontenc}
+\usepackage{color,graphicx}
+
+\begin{document}
+
+\title{Kernel Based Approaches for Change-Point Detection\\ Midway report}
+\date{June 30, 2016}
+\author{Anirudhan J. Rajagopalan, ajr619}
+
+\maketitle
+
+\newpage
+
+\begin{abstract}
+  Electroencephalography (EEG) signals are detected by using electrodes that are applied to the surface of mamals.  A sensitive instrument can show continuous fluctuations of the electric potential between the electrodes.  These potentials are due to the superposition of the electrical activity of tens of thousands of neuron cells lying on the surface areas of the brain~\cite{npsdpm}.  A typical human EEG signal is produced by 36 electrodes placed on the scalp.  This work aims to exploit the spatial relation of the electrodes to identify a Reproducing Kernel Hilbert Space (RKHS) kernel function that will help us find the change points in the EEG signal data.
+\end{abstract}
+
+
+\section{Change point detection}
+\subsection{Stationary process}
+A stationary process is a stochastic process whose joint probability distribution does not change when shifted in time.  Consequently, parameters that define the process such as mean ($\mu$), standard deviation ($\sigma$) remain constant
+
+\subsection{Change points}
+A change point in a time series is the times at which the probability distribution of the time series changes.  A change point detection problem involves detecting whether or not a change has occured, and identifying the times at which such changes occured.
+
+Change points can be identified when the parameters defining the stationary process, such as mean ($\mu$) and standard deviation ($\sigma$) changes.  We discuss ways to identify change points when mean of the process changes.
+\subsection{Offline Change point detection}
+Offline change point detection or retrospective change point detection methods has the complete data available at the beginning of the program.
+
+\subsubsection{Univariate Time series}
+Lets assume a time series of observations $x_{1}, x_{2}, \ldots, x_{n} $ of independent random variables with parameters $(\mu_{1}, \sigma_{1}^{2}), (\mu_{2}, \sigma_{2}^{2}), \ldots, (\mu_{n}, \sigma_{n}^{2}) $.
+Also lets assume that each of the observation $ x_{i} $ is normally distributed with mean $ \mu $ and common variance $\sigma^{2} \forall i \in 1, 2, \ldots ,n $.
+When there is no change in mean, the hypothesis of stability (null hypothesis) is defined as
+\begin{align}
+  H_{0} : \mu_{1} = \mu_{2} = \cdots =  \mu_{n} = \mu
+\end{align}
+Lets suppose that there is a change in the mean in the observations at an unknown point $ K $.  This can be define dy
+\begin{align}
+  H_{1} : \mu_{1} = \ldots \mu_{k} \ne \mu_{k+1} \ldots =  \mu_{n}
+\end{align}
+In our experiments we are going to assume that we know $\mu_{1}, \mu_{n} $ and $ \sigma $ are known beforehand (Refer $2.1.1$ of~\cite{birkhauser_pscpa}).
+
+We can find the change poing by using Maximum Likelihood estimates.
+
+Under $H_{0} $,
+\begin{align}
+  L_{0}(\mu) =& \frac{1}{{(\sqrt{2\pi})}^n} e^{-\sum_{i=1}^{n} \frac{{(x_{i} - \mu)}^2}{2} } \\
+\end{align}
+and the Maximum likelihood estimator is given by
+\begin{align}
+  \hat{\mu} =& \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_{i}
+\end{align}
+
+Under $H_{1} $,
+\begin{align}
+  L_{1}(\mu_{1}, \mu_{n}) =& \frac{1}{{(\sqrt{2\pi})}^n} e^{-(\frac{\sum_{i=1}^{k} {(x_{i} - \mu_{1})}^2 + \sum_{i=k+1}^{n} {(x_{i} - \mu_{n})}^2}{2})} \\
+\end{align}
+and the Maximum likelihood estimator is given by
+\begin{align}
+  \hat{\mu_{1}} =& \bar{x_{k}} = \frac{1}{k}\sum_{i=1}^{k} x_{i} \\
+  \hat{\mu_{n}} =& \bar{x_{n-k}} = \frac{1}{n-k}\sum_{i=k+1}^{n} x_{i} 
+\end{align}
+
+We can use the Maximum likelihood estimator directly to find the change points in the given data.  But calculating the MLE is computationaly intractable.  
+An alternate set of equations is given in Chapter 2 of~\cite{birkhauser_pscpa}.  We use the alternate set of equations to find the change points.  The experiments using sample data and its results are shown below.
+
+\subsubsection{Experiments --- Univariate time series}
+The offline changepoint detection problem, gives a pretty accurate value for changepoint at k = 300.  The different plots are as displayed below.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/1d_offline/ts}
+  \caption{One dimensional time series.\label{fig:1d_ts}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/1d_offline/sk}
+  \caption{SK values for one dimensional offline detection problem.\label{fig:1d_sk}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/1d_offline/vk}
+  \caption{VK values for one dimensional offline detection problem.\label{fig:1d_vk}}
+\end{figure}
+
+
+\subsubsection{Multivariate Time series}
+
+Multivariate model is similar to the above Univariate model except that each and every observation is m-dimensional.
+Let $x_{1}, x_{2}, \ldots , x_{n}$ be a sequence of independent $m$-dimensional normal random vectors with parameters $(\mu_{1}, \Sigma_{1}), (\mu_{2}, \Sigma_{2}), \ldots, (\mu_{n}, \Sigma_{n})$, respectively.
+Assume $\Sigma_{1} = \Sigma_{2} = \cdots = \Sigma_{n} = \Sigma $.
+The null hypothesis is given by 
+\begin{align}
+H_{0} : \mu_{1} = \mu_{2} = \cdots = \mu_{n} = \mu (\mathrm{unknown})
+\end{align}
+
+If we assume that there is a change at point $k$ in the paramters governing the observation, then the hypothesis (alternate hypothesis) is given by
+
+\begin{align}
+H_{1} : \mu_{1} = \cdots = \mu_{k} \ne \mu_{k+1} = \mu_{n}
+\end{align}
+Where k represents the position of the single change point. (Refer 3.1 of~\cite{birkhauser_pscpa}).
+
+This can be solved by following the steps described in section 3.1.1 of~\cite{birkhauser_pscpa}.  As in the case of univariate model, finding the likelihood directly is computationally intractable as $2\pi$ and $e$ has negative powers that can go pretty large and hence the likelihood will always become 1.
+
+\subsubsection{Experiments --- Multivariate change point detection}
+We did Several experiments by varying the number of dimension and also the total number of samples.  So far, in all variations, we are able to identify the change point pretty accurately using the offline detection method described above.  The plots below are for dimension = 6 and number of samples = 600 with change point at 300.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/rd_offline/ts}
+  \caption{Multi dimensional time series.\label{fig:rd_ts}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/rd_offline/y_k}
+  \caption{Value of y\_k with respect to various k.\label{fig:rd_y_k}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/rd_offline/w_k}
+  \caption{Value of w\_k with respect to various k.\label{fig:rd_w_k}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/rd_offline/tk_sq}
+  \caption{Value of the test stastic $ T_{k}^{2} $ with respect to various k.\label{fig:rd_tk_sq}}
+\end{figure}
+
+
+\subsection{Online Change point detection}
+Online detection of change point is slightly difficult than offline detection. We have a series of observation defined by $x_{1}, x_{2}, \ldots, x_{n} $.  Each observation denoted by $x_{i}$ is assumed to be made of N samples.
+
+We start by defining a sufficient stastic as:
+\begin{align}
+  s_{i} = \ln{\frac{p\theta_{1}(y_{i})}{p\theta_{0}(y_{i})}}
+\end{align}
+
+We also define a decision rule d given by
+\begin{align}
+  d = \begin{cases}
+    0 & if S_{1}^{N} < h; H_{0} \text{~is chosen}\\
+    1 & if S_{1}^{N} \ge h; H_{1} \text{~is chosen}\\
+      \end{cases}
+\end{align}
+
+Where h is a threshold chosen by the user.  $S_{1}^{N}$ is called as the decision function.
+
+We also have a stopping rule which is defined by 
+\begin{align}
+  t_{a} = N.\min{K : d_{K} = 1}
+\end{align}
+Where d is the decision taken with the aid of the decision function defined above.  This method of finding the stopping rule and alarm time is as given in\cite{basseville_nikiforov}
+
+\subsubsection{Experiments --- Online change point detection}
+
+We run experiments using grid search with various values of h and kappa.  In this particular experiment, we used values ranging from 1.5 to 5.5 with step size 0.25 for h and 0.5 to 4 with step size of 0.25 for kappa.  We then proceed to find all the values of the stopping rule and also the alarm time for h and kappa combination.  The time series, the plots for alarm time and stopping rule are plotted below.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/1d_online/ts}
+  \caption{One dimensional time series for online detection.\label{fig:1d_o_ts}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/1d_online/time}
+  \caption{Stopping rule for various values of h and kappa.\label{fig:1d_o_time}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/1d_online/alarm}
+  \caption{Alarm time for values of h and kappa.\label{fig:1d_o_alarm}}
+\end{figure}
+
+\section{Spectral Density}
+Autocovariance function (ACVF) and autocorrelation (ACF), as the name suggests, measures the variance of the time series sample $x_{t} $with respect to a future time sample $ x_{t+h} $.  The formula for finding the autocovariance is given in definition 1.4.4 of~\cite{itsf}.
+As per the definition 
+
+\subsection{Auto CoVariance Function}
+\begin{align}
+  \label{eq_acvf}
+  \hat{\gamma}(h) \coloneqq n^{-1} \sum_{t = 1}^{n - \vert h \vert} (x_{t+|h|} - \bar{x}) (x_{t} - \bar{x})
+\end{align}
+Where -n < h < n
+
+\subsection{Auto Corelation Function}
+
+The autocorelation function is given by the formula:
+\begin{align}
+  \label{eq_acf}
+  \hat{\rho}(h) = \frac{\hat{\gamma}(h)}{\hat{\gamma}(0)}
+\end{align}
+
+Using these two formulas we can find the ACVF and ACF for a time series.  The plot of the time series and the power spectral density obtained by np.fft is given below
+
+\subsubsection{Experiments --- Spectral density for univariate time series}
+The spectral density for univariate time series is given in Figures~\ref{fig:sd_psd}~\ref{fig:sd_acf_acvf}~\ref{fig:sd_sd}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/spectral_density/psd}
+  \caption{Plot of power spectral density (bottom) obtained after using fourier transform numpy module on the timeseries given in the topplot.\label{fig:sd_psd}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/spectral_density/acf_acvf}
+  \caption{ACVF and ACF of the time series.\label{fig:sd_acf_acvf}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/spectral_density/sd}
+  \caption{Spectral density for lambdas ranging from -3.14 to 3.14.\label{fig:sd_sd}}
+\end{figure}
+
+\subsubsection{Experiments --- Spectral density for linear combination of sinusoidals}
+
+Suppose we have a time series defined as 
+\begin{align}
+  X_{t} = \sum_{j = 1}^{k} (A_{j} \cos(\omega_{j}t) + B_{j} \sin(\omega_{j}t)), \qquad 0 < \omega_{1} < \cdots < \omega_{k} < \pi
+\end{align}
+
+The time series is given in Figure~\ref{fig:sd2_ts} The timeseries is generated with values 
+\begin{align*}
+  K =& 2\\ 
+  \omega =& [ 1.57079633, 0.78539816],\\
+  A =& [-0.31201389 -1.04898091] \text{\quad and} \\
+  B =& [-0.33909457 -0.1755208 ].
+\end{align*}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/spectral_density_2/ts}
+  \caption{Timeseries generated by Linear combination of sinusoidals.~\label{fig:sd2_ts}}
+\end{figure}
+
+The Auto Covariance Function (ACVF) of this time series is given by
+\begin{align}
+  \gamma(h) = \sum_{j=1}^{k} \sigma^{2}\cos(\omega_{j}h)
+\end{align}
+
+as defined in~\cite{itsf}. 
+
+The ACVF as a function of $h$ is shown in Figure~\ref{fig:sd2_acvf}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/spectral_density_2/acvf}
+  \caption{ACVF for the timeseries defined in Figure~\ref{fig:sd2_ts}.\label{fig:sd2_acvf}}
+\end{figure}
+
+Also the spectral density is given by:
+
+\begin{align}
+  F_{j}(\lambda) = \begin{cases}
+    0.0 & \text{if \qquad } \lambda < -\omega_{j},\\
+    0.5 & \text{if \qquad } -\omega_{j} \le \lambda < \omega_{j},\\
+    1.0 & \text{if \qquad } \lambda \ge \omega_{j}.
+  \end{cases}
+\end{align}
+
+The spectral density of the function for $h \in (-\pi, \pi)$ is shown in Figure~\ref{fig:sd2_sd}.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/spectral_density_2/sd}
+  \caption{Spectral density for the timeseries defined in Figure~\ref{fig:sd2_ts}.\label{fig:sd2_sd}}
+\end{figure}
+
+
+\subsection{Peridogram}
+
+We can find the peridogram of a time series given by samples ${x_{1}, \ldots, x_{n}}$ by
+\begin{align}
+  I_{n}(\lambda) = \frac{1}{n} \lvert\sum_{t=1}^{n} x_{t}e^{-it\lambda} \rvert^{2}
+\end{align}
+
+The peridogram of the time series defined given in Figure~\ref{fig:sd2_ts} is given in Figure~\ref{fig:sd2_peri1}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/spectral_density_2/peri1}
+  \caption{Peridogram for the timeseries defined in Figure~\ref{fig:sd2_ts}.\label{fig:sd2_peri1}}
+\end{figure}
+
+As can be clearly seen from Figure~\ref{fig:sd2_peri1}, the peridogram has high values of $I$ which corresponds to the frequencies that make up the signal.
+
+We also ran several other experiments using time series generated by stacking multiple sinusoidal signals with varying frequencies.  Below is a time series which is a combination of sinusoidals with frequencies$(1, 2, 3)$ stacked one after the other along with gaussian noise.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/spectral_density_2/ts2}
+  \caption{Time series formed by concatenating 50 samples generated by linear combination of sinusoidals of frequencies 1, 2, and 3.  The change points are at time t = 50, and 100.\label{fig:sd2_ts2}}
+\end{figure}
+
+The peridogram for this time series is calculated for values of lambda ranging from $(-\pi, \pi)$.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/spectral_density_2/peri2}
+  \caption{Peridogram for time series shown in Figure~\ref{fig:sd2_ts2}.\label{fig:sd2_peri2}}
+\end{figure}
+
+\section{Change points using spectral density}
+We can find change points in a time series using the peridogram as described in section 4 of~\cite{lavielle2005using}
+
+\subsection{Peridogram}
+The peridogram is defined by 
+\begin{align}
+  I_{k}(u) = \frac{1}{2\pi n_{k}} {\lvert \sum_{j = \tau_{k-1}+1}^{\tau_{k}} Y_{j} e^{iju} \rvert }^{2}
+\end{align}
+The energy of the process in frequency bands given by $[\lambda_{j}, \mu_{j}), 1 \le j le J $ can be given by 
+\begin{align}
+  F_{kj} = \int_{\lambda_{j}}^{\mu_{j}} I_{k}(u) du
+\end{align}
+
+The change points can be identified by using the contrast function
+\begin{align}
+  J_{n}(\tau, y) = -\frac{1}{n} \sum_{k=1}^{k*} (n_{k} \sum_{j=1}^{J} F^{2}_{kj})
+\end{align}
+
+\subsection{Experiments --- Multivariate signal}
+We generate a sample time series signal which is a linear combination of four frequencies in the range of $\alpha, \beta, \delta, \theta $ frequencies.  We have also added some gaussian noise to the time series.
+
+The timeseries is as given in figure~\ref{fig:cp_sd_ts}
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=1\textwidth]{images/changepoint_sd/ts}
+  \caption{Time series formed by linear combination of sinusoidals with same frequency as that of brain signals.\label{fig:cp_sd_ts}}
+\end{figure}
+
+The data is sampled at 50 samples per second.
+
+The code for finding the changepoints can be found in \url{https://git.io/vr2B3}.  The code consists of mainly three parts
+\begin{enumerate}
+  \item Contrast function
+  \item Dynamic programming module to find the all possible change point paths.
+  \item Model selection function that given a change point number, K, gives the indexes of change point in the time series data.
+\end{enumerate}
+
+The given timeseries has change points at point 500, 1000, 1500.  The algorithm gives change point values at \textbf{506, 985, and 1519} against the original change points of 500, 1000, and 1500.
+
+We also ran several experiments with several other artificially generated datasets and the changepoint values are closer to the actual change points in the time series.
+
+\subsubsection{Explanation of the algorithm}
+The algorithm consists of two main parts
+\begin{enumerate}
+  \item Penality function
+  \item Contrast function
+\end{enumerate}
+
+The algorithm initially creates the list of all possible contrast values for each and every sample point.  This is stored in array matD.  Then it uses dynamic programming to find the penality values and arrive at the list of all possible changepoints for any given changepoint n.  This is given by T.  We then query T for the corresponding change points which we attempt to check for and this gives us the actual change point instances.
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
